@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, createContext, useContext } from 'r
 import TargetedStatesDisplay from './components/TargetedStatesDisplay.jsx';
 import IndiaMap from './components/IndiaMap.jsx';
 import FRAAtlas from './components/FRAAtlas.jsx';
+import GeoPortalMap from './components/GeoPortalMap.jsx';
 import { ThemeProvider, useTheme } from './components/ThemeProvider.jsx';
 import DocumentDigitizer from './components/DocumentDigitizer.jsx';
 // import axios from 'axios'; // Uncomment when connecting to a real backend
@@ -123,7 +124,6 @@ const translations = {
         edit: 'Edit',
         save: 'Save',
         upload_new: 'Upload New',
-        claim_id: 'Claim ID',
         claim_type: 'Claim Type',
         patta_holder: 'Patta Holder',
         area_acres: 'Area (Acres)',
@@ -294,16 +294,86 @@ const api = {
     getDashboardStats: () => new Promise(resolve => {
         setTimeout(() => {
             resolve({
-                digitizedRecords: 0, digitizedRecordsChange: "+0",
-                villagesMapped: 0, villagesMappedChange: "+0",
-                assetsIdentified: 0, assetsIdentifiedChange: "+0",
-                grievancesLogged: 0, grievancesLoggedChange: "+0"
+                digitizedRecords: 42500,
+                digitizedRecordsChange: "+12.5%",
+                villagesMapped: 38750,
+                villagesMappedChange: "+8.3%",
+                assetsIdentified: 1250000,
+                assetsIdentifiedChange: "+15.2%",
+                grievancesLogged: 3240,
+                grievancesLoggedChange: "+5.7%"
             });
         }, 1500);
     }),
     getFraRecords: () => new Promise(resolve => {
         setTimeout(() => resolve([]), 1000);
     }),
+    getTargetedStates: () => new Promise(resolve => {
+        setTimeout(() => {
+            resolve([
+                {
+                    id: 'mp',
+                    name: 'Madhya Pradesh',
+                    shortName: 'MP',
+                    lat: 22.9734,
+                    lng: 78.6569,
+                    color: '#FF6B6B',
+                    villages: 18542,
+                    claims: 12500,
+                    description: 'Central Indian state with significant forest cover',
+                    forestCover: '77,462 km²',
+                    districts: ['Indore', 'Bhopal', 'Jabalpur', 'Gwalior', 'Ujjain', 'Sagar'],
+                    priority: 'High',
+                    status: 'Active'
+                },
+                {
+                    id: 'od',
+                    name: 'Odisha',
+                    shortName: 'OD',
+                    lat: 20.9517,
+                    lng: 85.0985,
+                    color: '#4ECDC4',
+                    villages: 9850,
+                    claims: 7200,
+                    description: 'Eastern state with rich biodiversity',
+                    forestCover: '51,345 km²',
+                    districts: ['Cuttack', 'Khordha', 'Ganjam', 'Mayurbhanj', 'Kalahandi', 'Sambalpur'],
+                    priority: 'High',
+                    status: 'Active'
+                },
+                {
+                    id: 'tr',
+                    name: 'Tripura',
+                    shortName: 'TR',
+                    lat: 23.9408,
+                    lng: 91.9882,
+                    color: '#FFD166',
+                    villages: 4200,
+                    claims: 3100,
+                    description: 'Northeastern state with dense tropical forests',
+                    forestCover: '10,237 km²',
+                    districts: ['Agartala', 'Dhalai', 'Gomati', 'Khowai', 'North Tripura', 'South Tripura'],
+                    priority: 'Medium',
+                    status: 'Active'
+                },
+                {
+                    id: 'tg',
+                    name: 'Telangana',
+                    shortName: 'TG',
+                    lat: 18.1124,
+                    lng: 79.0193,
+                    color: '#6A0572',
+                    villages: 11320,
+                    claims: 8450,
+                    description: 'Southern state with diverse ecosystems',
+                    forestCover: '25,789 km²',
+                    districts: ['Hyderabad', 'Warangal', 'Karimnagar', 'Khammam', 'Nizamabad', 'Mahbubnagar'],
+                    priority: 'Medium',
+                    status: 'Active'
+                }
+            ]);
+        }, 1000);
+    })
 };
 
 // --- HOOKS ---
@@ -535,6 +605,24 @@ const StatCardSkeleton = ({ color = 'gray' }) => {
 const TargetedStatesContainer = () => {
   const [selectedState, setSelectedState] = useState(null);
   const [showDetails, setShowDetails] = useState(false);
+  const [targetStates, setTargetStates] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch target states data
+  useEffect(() => {
+    const fetchTargetStates = async () => {
+      try {
+        const data = await api.getTargetedStates();
+        setTargetStates(data);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching target states:', error);
+        setLoading(false);
+      }
+    };
+
+    fetchTargetStates();
+  }, []);
 
   const handleStateClick = (state) => {
     setSelectedState(state);
@@ -542,8 +630,27 @@ const TargetedStatesContainer = () => {
     console.log('State clicked:', state);
   };
 
+  const handleViewDetailedReport = (state) => {
+    // In a real application, this would navigate to a detailed report page for the state
+    alert(`Viewing detailed report for ${state.name}`);
+    console.log('Viewing detailed report for state:', state);
+    // For now, we'll just close the modal
+    setShowDetails(false);
+  };
+
+  if (loading) {
+    return (
+      <div className="w-full h-96 bg-gray-100 dark:bg-gray-800/50 rounded-2xl overflow-hidden relative flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+          <p className="mt-2 text-gray-600 dark:text-gray-300">Loading targeted states...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="w-full h-96 bg-gray-100 dark:bg-gray-800/50 rounded-2xl overflow-hidden relative">
+    <div className="w-full h-auto bg-gray-100 dark:bg-gray-800/50 rounded-2xl overflow-hidden relative">
       <TargetedStatesDisplay
         onStateClick={handleStateClick}
         selectedStates={selectedState ? [selectedState] : []}
@@ -567,22 +674,60 @@ const TargetedStatesContainer = () => {
             </div>
             <div className="space-y-3 text-sm">
               <p className="text-gray-600 dark:text-gray-300">
-                {selectedState.description || 'Key target state for FRA implementation'}
+                {selectedState.description}
               </p>
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg border border-blue-200 dark:border-blue-800">
                   <div className="text-blue-600 dark:text-blue-400 font-semibold">
-                    {selectedState.villages?.toLocaleString() || '4,820'}
+                    {selectedState.villages?.toLocaleString()}
                   </div>
                   <div className="text-gray-600 dark:text-gray-400 text-xs">Villages Mapped</div>
                 </div>
                 <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg border border-green-200 dark:border-green-800">
                   <div className="text-green-600 dark:text-green-400 font-semibold">
-                    {selectedState.assets?.toLocaleString() || '8,598,745'}
+                    {selectedState.claims?.toLocaleString()}
                   </div>
-                  <div className="text-gray-600 dark:text-gray-400 text-xs">Assets Identified</div>
+                  <div className="text-gray-600 dark:text-gray-400 text-xs">FRA Claims</div>
+                </div>
+                <div className="bg-purple-50 dark:bg-purple-900/20 p-3 rounded-lg border border-purple-200 dark:border-purple-800">
+                  <div className="text-purple-600 dark:text-purple-400 font-semibold">
+                    {selectedState.forestCover}
+                  </div>
+                  <div className="text-gray-600 dark:text-gray-400 text-xs">Forest Cover</div>
+                </div>
+                <div className="bg-orange-50 dark:bg-orange-900/20 p-3 rounded-lg border border-orange-200 dark:border-orange-800">
+                  <div className="text-orange-600 dark:text-orange-400 font-semibold">
+                    {selectedState.districts?.length}
+                  </div>
+                  <div className="text-gray-600 dark:text-gray-400 text-xs">Districts</div>
                 </div>
               </div>
+              <div className="pt-3 border-t border-gray-200 dark:border-gray-700">
+                <h4 className="font-semibold text-gray-800 dark:text-white mb-2">Priority Level</h4>
+                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                  selectedState.priority === 'High' 
+                    ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300' 
+                    : selectedState.priority === 'Medium' 
+                      ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300' 
+                      : 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300'
+                }`}>
+                  {selectedState.priority} Priority
+                </span>
+              </div>
+            </div>
+            <div className="mt-6 flex justify-end space-x-3">
+              <button
+                onClick={() => setShowDetails(false)}
+                className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              >
+                Close
+              </button>
+              <button
+                onClick={() => handleViewDetailedReport(selectedState)}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                View Detailed Report
+              </button>
             </div>
           </div>
         </div>
@@ -750,6 +895,7 @@ const FRAAtlasContent = () => {
     });
     const [focusedState, setFocusedState] = useState(null);
     const [selectedStatesForMap, setSelectedStatesForMap] = useState([]);
+    const [mapView, setMapView] = useState('standard'); // 'standard' or 'geoportal'
 
     const districts = districtData[selectedState] || [];
     const localLang = stateLanguageMap[selectedState];
@@ -787,6 +933,37 @@ const FRAAtlasContent = () => {
                 {/* Control Panel */}
                 <div className={`w-1/4 max-w-sm p-4 border-r ${theme.border} overflow-y-auto`}>
                     <h3 className={`text-lg font-bold ${theme.text} mb-6`}>{t('filters_layers')}</h3>
+                    
+                    {/* Map View Toggle */}
+                    <div className="mb-6">
+                        <label className={`block text-sm font-medium ${theme.textMuted} mb-2`}>
+                            Map View
+                        </label>
+                        <div className="flex rounded-md shadow-sm">
+                            <button
+                                type="button"
+                                className={`flex-1 py-2 px-4 text-sm font-medium rounded-l-md ${
+                                    mapView === 'standard'
+                                        ? 'bg-blue-600 text-white'
+                                        : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600'
+                                }`}
+                                onClick={() => setMapView('standard')}
+                            >
+                                Standard
+                            </button>
+                            <button
+                                type="button"
+                                className={`flex-1 py-2 px-4 text-sm font-medium rounded-r-md ${
+                                    mapView === 'geoportal'
+                                        ? 'bg-blue-600 text-white'
+                                        : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600'
+                                }`}
+                                onClick={() => setMapView('geoportal')}
+                            >
+                                GeoPortal
+                            </button>
+                        </div>
+                    </div>
                     
                     {/* Language Switch */}
                     {localLang && (
@@ -925,7 +1102,12 @@ const FRAAtlasContent = () => {
 
                 {/* Enhanced Map Container */}
                 <div role="application" aria-label="Enhanced India map with FRA data" className={`flex-1 ${theme.isDark ? 'bg-gray-900/50' : 'bg-gray-200/50'} rounded-r-2xl relative`}>
-                    {selectedState === 'Tripura' || selectedState === 'Madhya Pradesh' || selectedState === 'Odisha' || selectedState === 'Telangana' ? (
+                    {mapView === 'geoportal' ? (
+                        <GeoPortalMap 
+                            selectedState={selectedState}
+                            theme={theme}
+                        />
+                    ) : selectedState === 'Tripura' || selectedState === 'Madhya Pradesh' || selectedState === 'Odisha' || selectedState === 'Telangana' ? (
                         <FRAAtlas
                             selectedState={selectedState}
                             selectedDistrict={selectedDistrict}
@@ -942,10 +1124,7 @@ const FRAAtlasContent = () => {
                             selectedStates={selectedStatesForMap}
                             focusState={focusedState}
                             mapLayers={mapLayers}
-                            selectedStateFilter={selectedState}
-                            selectedDistrictFilter={selectedDistrict}
                             theme={theme}
-                            timelineData={timelineDates}
                         />
                     )}
                     
@@ -959,24 +1138,7 @@ const FRAAtlasContent = () => {
                     )}
                 </div>
             </div>
-            
-            {/* Status Bar */}
-            <div className={`mt-4 p-3 ${theme.cardBg} rounded-lg ${theme.shadow} text-sm`}>
-                <div className="flex justify-between items-center">
-                    <div className="flex items-center space-x-4">
-                        <span className={`${theme.textMuted}`}>Active Layers:</span>
-                        {Object.entries(mapLayers).filter(([_, active]) => active).map(([layer, _]) => (
-                            <span key={layer} className={`px-2 py-1 ${theme.isDark ? 'bg-blue-900/30' : 'bg-blue-100'} ${theme.isDark ? 'text-blue-300' : 'text-blue-700'} rounded text-xs`}>
-                                {layer.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
-                            </span>
-                        ))}
-                    </div>
-                    <div className={`${theme.textMuted}`}>
-                        Selected: {selectedState} {selectedDistrict !== 'All' ? `/ ${selectedDistrict}` : ''}
-                    </div>
-                </div>
-            </div>
-        </div> 
+        </div>
     );
 };
 
