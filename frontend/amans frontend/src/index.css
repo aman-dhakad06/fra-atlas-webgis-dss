@@ -3,3 +3,216 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Leaflet fixes */
+.leaflet-container {
+  @apply h-full w-full;
+}
+
+.leaflet-control-attribution {
+  @apply text-xs;
+}
+
+/* Custom marker styles */
+.custom-marker {
+  background: transparent !important;
+  border: none !important;
+}
+
+/* Fix for leaflet marker icons */
+.leaflet-marker-icon {
+  margin-left: -12px !important;
+  margin-top: -41px !important;
+}
+
+.leaflet-popup-content-wrapper {
+  @apply rounded-lg;
+}
+
+.leaflet-popup-tip {
+  @apply hidden;
+}
+
+/* Global theme transitions */
+*, *::before, *::after {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+/* Root HTML theme classes */
+html {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+html.light {
+  background-color: #f9fafb;
+  color: #111827;
+}
+
+html.dark {
+  background-color: #111827;
+  color: #f9fafb;
+}
+
+/* Theme-aware component styles */
+.theme-card {
+  @apply transition-all duration-300;
+}
+
+.light .theme-card {
+  @apply bg-white text-gray-800 border-gray-200;
+}
+
+.dark .theme-card {
+  @apply bg-gray-800 text-white border-gray-700;
+}
+
+.theme-text {
+  @apply transition-colors duration-300;
+}
+
+.light .theme-text {
+  @apply text-gray-800;
+}
+
+.dark .theme-text {
+  @apply text-white;
+}
+
+.theme-text-muted {
+  @apply transition-colors duration-300;
+}
+
+.light .theme-text-muted {
+  @apply text-gray-600;
+}
+
+.dark .theme-text-muted {
+  @apply text-gray-300;
+}
+
+.theme-text-secondary {
+  @apply transition-colors duration-300;
+}
+
+.light .theme-text-secondary {
+  @apply text-gray-700;
+}
+
+.dark .theme-text-secondary {
+  @apply text-gray-200;
+}
+
+.theme-text-subtle {
+  @apply transition-colors duration-300;
+}
+
+.light .theme-text-subtle {
+  @apply text-gray-500;
+}
+
+.dark .theme-text-subtle {
+  @apply text-gray-400;
+}
+
+.theme-bg {
+  @apply transition-colors duration-300;
+}
+
+.light .theme-bg {
+  @apply bg-gray-50;
+}
+
+.dark .theme-bg {
+  @apply bg-gray-900;
+}
+
+/* Interactive elements */
+.theme-hover {
+  @apply transition-all duration-300;
+}
+
+.light .theme-hover:hover {
+  @apply bg-gray-100;
+}
+
+.dark .theme-hover:hover {
+  @apply bg-gray-700;
+}
+
+/* Form elements */
+input, select, textarea {
+  @apply transition-all duration-300;
+}
+
+.light input, .light select, .light textarea {
+  @apply bg-white text-gray-900 border-gray-300;
+}
+
+.dark input, .dark select, .dark textarea {
+  @apply bg-gray-700 text-white border-gray-600;
+}
+
+/* Animation keyframes */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animation utility classes */
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out;
+}
+
+.animate-fade-in-slow {
+  animation: fade-in 0.8s ease-out;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.3s ease-out;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.4s ease-out;
+}
+
+/* Loading spinner enhancement */
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
